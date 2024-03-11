@@ -20,7 +20,7 @@ public class WeatherObservationController {
     }
     @GetMapping
     public List<WeatherObservation> getWeatherObservations(){
-        weatherObservationService.processWeatherData();
+        //weatherObservationService.processWeatherData();
         return weatherObservationService.getAllObservations();
     }
 }

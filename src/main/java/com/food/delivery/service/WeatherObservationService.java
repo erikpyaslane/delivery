@@ -2,6 +2,7 @@ package com.food.delivery.service;
 
 import com.food.delivery.entity.WeatherObservation;
 import com.food.delivery.repository.WeatherObservationRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,11 +47,12 @@ public class WeatherObservationService {
      * Method, which processing weather observations data
      *
      */
+    @Scheduled(cron = "0 15 * * * ?")
     public void processWeatherData() {
 
         try {
             NodeList listOfStationsXML = null;
-            listOfStationsXML = convertDataToDocument();
+            listOfStationsXML = convertDataToTheListOfStationsXML();
 
             for (int index = 0; index < listOfStationsXML.getLength(); index++) {
                 Node node = listOfStationsXML.item(index);
@@ -86,7 +88,7 @@ public class WeatherObservationService {
 
     }
 
-    private NodeList convertDataToDocument() throws ParserConfigurationException, IOException, SAXException {
+    private NodeList convertDataToTheListOfStationsXML() throws ParserConfigurationException, IOException, SAXException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
