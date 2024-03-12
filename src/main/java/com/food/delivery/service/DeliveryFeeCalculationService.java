@@ -1,33 +1,76 @@
 package com.food.delivery.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.food.delivery.entity.*;
+import com.food.delivery.exception.NoSuchVehicleTypeException;
+import com.food.delivery.repository.DeliveryFeeRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DeliveryFeeCalculationService {
 
     private final WeatherObservationService weatherObservationService;
+    private final BusinessRuleService businessRuleService;
+    private final DeliveryFeeRepository deliveryFeeRepository;
 
-    public DeliveryFeeCalculationService(WeatherObservationService weatherObservationService) {
+    public DeliveryFeeCalculationService(WeatherObservationService weatherObservationService,
+                                         BusinessRuleService businessRuleService,
+                                         DeliveryFeeRepository deliveryFeeRepository) {
         this.weatherObservationService = weatherObservationService;
+        this.businessRuleService = businessRuleService;
+        this.deliveryFeeRepository = deliveryFeeRepository;
     }
 
+    public void saveRGB(String cityName, String scooterRGB, String bikeRGB, String carRGB) {
 
+    }
 
-    public double calculateExtraFee (double air, double wind, String phenomenon, String vehicle) throws Exception {
+    public double getCalculationFee(String cityName, String vehicleType) {
+
+        VehicleType convertedVehicleType = null;
+        double totalFee = 0.0;
+
+        try {
+            convertedVehicleType = VehicleType.valueOf(vehicleType);
+            totalFee = calculateTotalFee(cityName, convertedVehicleType);
+        } catch (IllegalArgumentException e) {
+            throw new NoSuchVehicleTypeException("No such vehicle type");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println(convertedVehicleType);
+        return totalFee;
+    }
+
+    public double calculateTotalFee(String city, VehicleType vehicleType) throws Exception {
+
+        //WeatherObservation weatherObservation = weatherObservationService.getLatestObservationByCityName(city);
+
+        //double extraFee = calculateExtraFee(weatherObservation, vehicleType);
+        return calculateRBF(city, vehicleType);
+    }
+
+    private double calculateRBF (String cityName, VehicleType vehicleType) {
+        RegionalBaseFee city = deliveryFeeRepository.findRegionalBaseFeeByCityName(cityName);
+
+        return switch (vehicleType) {
+            case BIKE -> city.getBikeRBF();
+            case CAR -> city.getCarRbf();
+            case SCOOTER -> city.getScooterRBF();
+        };
+    }
+
+    private double calculateExtraFee (WeatherObservation weatherObservation, VehicleType vehicleType) throws Exception {
         double totalExtraFee = 0;
 
-        totalExtraFee += calculateATEF(air);
-        totalExtraFee += calculateWSEF(wind, vehicle);
-        totalExtraFee += calculateWPEF(phenomenon);
+        totalExtraFee += calculateATEF(weatherObservation.getAirTemperature());
+        totalExtraFee += calculateWSEF(weatherObservation.getWindSpeed(), vehicleType);
+        totalExtraFee += calculateWPEF(weatherObservation.getWeatherPhenomenon());
 
         return totalExtraFee;
-    }
-
-
-
-    public double calculateRBF (String city, String vehicleType) {
-        return 0.0;
     }
 
     private double calculateATEF(double air) {
@@ -35,13 +78,12 @@ public class DeliveryFeeCalculationService {
         if (air <= 0.0) return 0.5;
         return 0.0;
     }
-    private double calculateWSEF(double wind, String vehicleType) throws Exception {
-        if (!vehicleType.equals("Bike"))
-            return 0.0;
-        if (wind <= 20 && wind >= 10)
-            return 0.5;
-        if (wind > 20)
-            throw new Exception("Usage of selected vehicle type is forbidden");
+    private double calculateWSEF(double wind, VehicleType vehicleType) throws Exception {
+        double fee = 0.0;
+        List<BusinessRule> businessRules = null;
+        businessRules = businessRuleService
+                .getBusinessRulesByVehicleTypeAndWeatherConditionType(vehicleType, WeatherConditionType.WSEF);
+
         return 0;
     }
     private double calculateWPEF(String phenomenon) {
@@ -50,4 +92,6 @@ public class DeliveryFeeCalculationService {
 
         return 0;
     }
+
+
 }
