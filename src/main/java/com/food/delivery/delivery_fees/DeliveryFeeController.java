@@ -1,10 +1,8 @@
-package com.food.delivery.controller;
+package com.food.delivery.delivery_fees;
 
-import com.food.delivery.service.DeliveryFeeCalculationService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
 
 @RestController
 public class DeliveryFeeController {
@@ -17,6 +15,11 @@ public class DeliveryFeeController {
     public double getVehicleRBF(@RequestParam("cityName") String cityName,
                                 @RequestParam("vehicleType") String vehicleType) {
         return deliveryFeeCalculationService.getCalculationFee(cityName, vehicleType);
+    }
+    @PutMapping("/api/delivery_fee")
+    @ResponseStatus(HttpStatus.OK)
+    void updateRBFofCity(@Valid @RequestBody RegionalBaseFee regionalBaseFee) {
+        deliveryFeeCalculationService.updateRBF(regionalBaseFee);
     }
 
 }

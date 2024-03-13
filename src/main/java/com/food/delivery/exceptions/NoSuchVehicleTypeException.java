@@ -1,4 +1,4 @@
-package com.food.delivery.exception;
+package com.food.delivery.exceptions;
 
 public class NoSuchVehicleTypeException extends IllegalArgumentException {
 

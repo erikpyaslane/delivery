@@ -1,4 +1,4 @@
-package com.food.delivery.entity;
+package com.food.delivery.weather_observations;
 
 import jakarta.persistence.*;
 

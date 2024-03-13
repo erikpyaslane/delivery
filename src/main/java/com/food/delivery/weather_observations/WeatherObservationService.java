@@ -1,7 +1,5 @@
-package com.food.delivery.service;
+package com.food.delivery.weather_observations;
 
-import com.food.delivery.entity.WeatherObservation;
-import com.food.delivery.repository.WeatherObservationRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;

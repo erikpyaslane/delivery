@@ -1,4 +1,4 @@
-package com.food.delivery.entity;
+package com.food.delivery.enums;
 
 public enum WeatherConditionType {
     ATEF, WSEF, WPEF

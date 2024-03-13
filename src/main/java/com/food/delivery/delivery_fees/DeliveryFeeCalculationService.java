@@ -1,9 +1,13 @@
-package com.food.delivery.service;
+package com.food.delivery.delivery_fees;
 
 
-import com.food.delivery.entity.*;
-import com.food.delivery.exception.NoSuchVehicleTypeException;
-import com.food.delivery.repository.DeliveryFeeRepository;
+import com.food.delivery.business_rules.BusinessRule;
+import com.food.delivery.business_rules.BusinessRuleService;
+import com.food.delivery.enums.VehicleType;
+import com.food.delivery.enums.WeatherConditionType;
+import com.food.delivery.exceptions.NoSuchVehicleTypeException;
+import com.food.delivery.weather_observations.WeatherObservation;
+import com.food.delivery.weather_observations.WeatherObservationService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,18 +17,18 @@ public class DeliveryFeeCalculationService {
 
     private final WeatherObservationService weatherObservationService;
     private final BusinessRuleService businessRuleService;
-    private final DeliveryFeeRepository deliveryFeeRepository;
+    private final RegionalBaseFeeRepository regionalBaseFeeRepository;
 
     public DeliveryFeeCalculationService(WeatherObservationService weatherObservationService,
                                          BusinessRuleService businessRuleService,
-                                         DeliveryFeeRepository deliveryFeeRepository) {
+                                         RegionalBaseFeeRepository regionalBaseFeeRepository) {
         this.weatherObservationService = weatherObservationService;
         this.businessRuleService = businessRuleService;
-        this.deliveryFeeRepository = deliveryFeeRepository;
+        this.regionalBaseFeeRepository = regionalBaseFeeRepository;
     }
 
     public void saveRGB(String cityName, String scooterRGB, String bikeRGB, String carRGB) {
-
+        System.out.println("Hi!");
     }
 
     public double getCalculationFee(String cityName, String vehicleType) {
@@ -46,21 +50,13 @@ public class DeliveryFeeCalculationService {
     }
 
     public double calculateTotalFee(String city, VehicleType vehicleType) throws Exception {
-
-        //WeatherObservation weatherObservation = weatherObservationService.getLatestObservationByCityName(city);
-
-        //double extraFee = calculateExtraFee(weatherObservation, vehicleType);
         return calculateRBF(city, vehicleType);
     }
 
     private double calculateRBF (String cityName, VehicleType vehicleType) {
-        RegionalBaseFee city = deliveryFeeRepository.findRegionalBaseFeeByCityName(cityName);
+        RegionalBaseFee city = regionalBaseFeeRepository.findRegionalBaseFeeByCityName(cityName);
 
-        return switch (vehicleType) {
-            case BIKE -> city.getBikeRBF();
-            case CAR -> city.getCarRbf();
-            case SCOOTER -> city.getScooterRBF();
-        };
+        return 0.0;
     }
 
     private double calculateExtraFee (WeatherObservation weatherObservation, VehicleType vehicleType) throws Exception {
@@ -94,4 +90,8 @@ public class DeliveryFeeCalculationService {
     }
 
 
+    public void updateRBF(RegionalBaseFee updatedDetails) {
+        System.out.println("In progress " + updatedDetails);
+
+    }
 }

@@ -1,7 +1,5 @@
-package com.food.delivery.controller;
+package com.food.delivery.weather_observations;
 
-import com.food.delivery.entity.WeatherObservation;
-import com.food.delivery.service.WeatherObservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

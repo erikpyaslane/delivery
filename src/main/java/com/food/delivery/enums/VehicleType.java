@@ -1,4 +1,4 @@
-package com.food.delivery.entity;
+package com.food.delivery.enums;
 
 public enum VehicleType {
     BIKE, SCOOTER, CAR;

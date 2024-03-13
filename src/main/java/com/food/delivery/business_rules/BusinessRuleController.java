@@ -1,7 +1,5 @@
-package com.food.delivery.controller;
+package com.food.delivery.business_rules;
 
-import com.food.delivery.entity.BusinessRule;
-import com.food.delivery.service.BusinessRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +17,14 @@ public class BusinessRuleController {
     }
 
     @GetMapping("/api/business_rules")
+    @ResponseStatus(value = HttpStatus.OK)
     public List<BusinessRule> getAllBusinessRules() {
         return businessRuleService.getAllBusinessRules();
+    }
+    @GetMapping("/api/business_rules")
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<BusinessRule> getBusinessRulesByVehicleType(@RequestParam String vehicleType) {
+        return businessRuleService.getBusinessRulesByVehicleType(vehicleType);
     }
 
     @PostMapping("/api/business_rules")
