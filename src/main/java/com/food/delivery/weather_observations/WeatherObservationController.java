@@ -17,23 +17,22 @@ public class WeatherObservationController {
     }
 
     @GetMapping
-    public List<WeatherObservation> getAllWeatherObservations() {
+    public List<WeatherObservationDTO> getAllWeatherObservations() {
         return weatherObservationService.getAllWeatherObservations();
     }
 
-    @GetMapping("/current")
-    public List<WeatherObservation> getCurrentWeatherObservations(){
-        weatherObservationService.updateWeatherData();
+    @GetMapping("/latest")
+    public List<WeatherObservationDTO> getLatestWeatherObservations(){
         return weatherObservationService.getLatestWeatherObservations();
     }
 
     @GetMapping("/{cityName}")
-    public List<WeatherObservation> getWeatherObservationsByCityName(@PathVariable String cityName) {
+    public List<WeatherObservationDTO> getWeatherObservationsByCityName(@PathVariable String cityName) {
         System.out.println(cityName);
         return weatherObservationService.getObservationsByCityName(cityName);
     }
-    @GetMapping("/{cityName}_latest")
-    public WeatherObservation getWeatherObservationByCityName(@PathVariable String cityName) {
+    @GetMapping("/{cityName}/latest")
+    public WeatherObservationDTO getWeatherObservationByCityName(@PathVariable String cityName) {
         System.out.println(cityName);
         return weatherObservationService.getLatestObservationByCityName(cityName);
     }

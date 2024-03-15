@@ -8,6 +8,7 @@ import com.food.delivery.enums.WeatherConditionType;
 import com.food.delivery.exceptions.NoSuchVehicleTypeException;
 import com.food.delivery.weather_observations.WeatherObservation;
 import com.food.delivery.weather_observations.WeatherObservationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class DeliveryFeeCalculationService {
     private final BusinessRuleService businessRuleService;
     private final RegionalBaseFeeRepository regionalBaseFeeRepository;
 
+    @Autowired
     public DeliveryFeeCalculationService(WeatherObservationService weatherObservationService,
                                          BusinessRuleService businessRuleService,
                                          RegionalBaseFeeRepository regionalBaseFeeRepository) {

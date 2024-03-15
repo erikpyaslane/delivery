@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/business_rules")
 public class BusinessRuleController {
 
     private final BusinessRuleService businessRuleService;
@@ -16,18 +17,18 @@ public class BusinessRuleController {
         this.businessRuleService = businessRuleService;
     }
 
-    @GetMapping("/api/business_rules")
+    @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
     public List<BusinessRule> getAllBusinessRules() {
         return businessRuleService.getAllBusinessRules();
     }
-    @GetMapping("/api/business_rules")
+    @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
     public List<BusinessRule> getBusinessRulesByVehicleType(@RequestParam String vehicleType) {
         return businessRuleService.getBusinessRulesByVehicleType(vehicleType);
     }
 
-    @PostMapping("/api/business_rules")
+    @PostMapping
     public ResponseEntity<BusinessRule> createBusinessRule(@RequestBody BusinessRule businessRule) {
         BusinessRule createdBusinessRule = businessRuleService.saveBusinessRule(businessRule);
         return new ResponseEntity<>(createdBusinessRule, HttpStatus.CREATED);

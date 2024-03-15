@@ -1,5 +1,8 @@
 package com.food.delivery.weather_observations;
 
+import com.food.delivery.exceptions.RecourceNotFoundException;
+import com.food.delivery.station_city_mapping.StationCityMappingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -17,32 +20,47 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 
 public class WeatherObservationService {
 
     private final WeatherObservationRepository weatherObservationRepository;
+    private final WeatherObservationDTOMapper weatherObservationDTOMapper;
+
+    private final StationCityMappingService stationCityMappingService;
 
     private static String url = "https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php";
 
-    public WeatherObservationService(WeatherObservationRepository weatherObservationRepository) {
+    @Autowired
+    public WeatherObservationService(WeatherObservationRepository weatherObservationRepository,
+                                     WeatherObservationDTOMapper weatherObservationDTOMapper,
+                                     StationCityMappingService stationCityMappingService) {
         this.weatherObservationRepository = weatherObservationRepository;
+        this.weatherObservationDTOMapper = weatherObservationDTOMapper;
+        this.stationCityMappingService = stationCityMappingService;
     }
 
     /**
      * Gets all weather observations from database using repository
      * @return List of WeatherObservation objects
      */
-    public List<WeatherObservation> getAllWeatherObservations() {
-        return weatherObservationRepository.findAll();
+    public List<WeatherObservationDTO> getAllWeatherObservations() {
+        return weatherObservationRepository.findAll()
+                .stream()
+                .map(weatherObservationDTOMapper)
+                .collect(Collectors.toList());
     }
     /**
      * Gets the latest weather observation from database using repository
      * @return List of WeatherObservation objects
      */
-    public List<WeatherObservation> getLatestWeatherObservations() {
-        return weatherObservationRepository.findTop3ByOrderByTimeOfObservationDesc();
+    public List<WeatherObservationDTO> getLatestWeatherObservations() {
+        return weatherObservationRepository.findTop3ByOrderByTimeOfObservationDesc()
+                .stream()
+                .map(weatherObservationDTOMapper)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -51,9 +69,12 @@ public class WeatherObservationService {
      * @param cityName name of city
      * @return list of WeatherObservation objects
      */
-    public List<WeatherObservation> getObservationsByCityName(String cityName) {
-        String stationName = mapCityNameToStationName(cityName);
-        return weatherObservationRepository.findWeatherObservationsByStationName(stationName);
+    public List<WeatherObservationDTO> getObservationsByCityName(String cityName) {
+        String stationName = stationCityMappingService.getStationNameByCityName(cityName);
+        return weatherObservationRepository.findWeatherObservationsByStationName(stationName)
+                .stream()
+                .map(weatherObservationDTOMapper)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -62,9 +83,11 @@ public class WeatherObservationService {
      * @param cityName name of city
      * @return list of WeatherObservation objects
      */
-    public WeatherObservation getLatestObservationByCityName(String cityName) {
-        String stationName = mapCityNameToStationName(cityName);
-        return weatherObservationRepository.findTopByStationNameOrderByTimeOfObservationDesc(stationName);
+    public WeatherObservationDTO getLatestObservationByCityName(String cityName) {
+        String stationName = stationCityMappingService.getStationNameByCityName(cityName);
+        return weatherObservationRepository.findTopByStationNameOrderByTimeOfObservationDesc(stationName)
+                .map(weatherObservationDTOMapper)
+                .orElseThrow();
     }
 
     /**
@@ -137,16 +160,8 @@ public class WeatherObservationService {
                 Double.parseDouble(windSpeed), phenomenon, localDateTime);
     }
 
-    private boolean isValidStation(String name) {
-            return name.equals("Tallinn-Harku") || name.equals("Tartu-Tõravere") || name.equals("Pärnu");
-    }
-
-    private String mapCityNameToStationName(String cityName) {
-        return switch (cityName) {
-            case "Tallinn" -> cityName + "-Harku";
-            case "Tartu" -> cityName + "-Tõravere";
-            default -> cityName;
-        };
+    private boolean isValidStation(String stationName) {
+            return stationCityMappingService.existsStationName(stationName);
     }
 
     public void setUrl(String url) {
